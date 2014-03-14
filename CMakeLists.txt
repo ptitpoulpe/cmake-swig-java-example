@@ -57,6 +57,9 @@ ADD_CUSTOM_COMMAND(TARGET example_swig
 		   #COMMAND cmake -E echo "Creating jar file...${JAVA_ARCHIVE}"
 		   #COMMAND ${JAVA_ARCHIVE} cvf example_swig.jar example
 		   )
+ADD_CUSTOM_COMMAND(TARGET example_swig
+                   POST_BUILD
+	           COMMAND ${JAVA_COMPILE} "example_test.java")
 	   
 enable_testing()
 ADD_TEST(example-test "java" "example_test")
