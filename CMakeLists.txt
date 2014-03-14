@@ -37,26 +37,19 @@ install_jni_symlink(example_swig_jar .)
 swig_add_module(example_swig java example.i "example.hpp" "example.cpp")
 swig_link_libraries(example_swig Example)
 
-#add_dependencies(example_swig_jar example_swig)
-
-#FILE(GLOB_RECURSE FOO_SRC  *.java)
-#AUX_SOURCE_DIRECTORY(${CMAKE_SWIG_OUTDIR} VARIABLE___)
-#message(STATUS "toot: ${CMAKE_SWIG_OUTDIR}, ${VARIABLE___}, ${FOO_SRC}")
 set(JAVA_BUNDLE "${CMAKE_HOME_DIRECTORY}/java_bundle.sh")
-set(JAVA_BUNDLE_SO_FILES libexample_swig.so)
+set(JAVA_BUNDLE_SO_FILES "${CMAKE_HOME_DIRECTORY}/libexample_swig.so")
+set(MANIFEST_FILE "${CMAKE_HOME_DIRECTORY}/MANIFEST")
 ADD_CUSTOM_COMMAND(TARGET example_swig
                    POST_BUILD
 		   DEPEND example_swig_jar
 		   COMMAND ${JAVA_BUNDLE} "example_swig_jar.jar" "${Java_JAVA_EXECUTABLE}" "example.NativeLib" "${CMAKE_STRIP}" -so ${JAVA_BUNDLE_SO_FILES} -txt ${JAVA_BUNDLE_TXT_FILES}
                    COMMAND ${JAVA_ARCHIVE} -uvf "example_swig_jar.jar" "NATIVE"
-		   COMMAND ${CMAKE_COMMAND} -E echo "Class-Path: ." > "MANIFEST"
+		   COMMAND ${CMAKE_COMMAND} -E echo "Class-Path: ." > ${MANIFEST_FILE}
                    COMMAND ${JAVA_ARCHIVE} -uvmf "MANIFEST" "example_swig_jar.jar"
-		   #COMMAND cmake -E echo "Compiling Java files...${JAVA_COMPILE}"
-		   #COMMAND cmake -E make_directory ${example_swig_BINARY_DIR}/example
-		   #COMMAND ${JAVA_COMPILE} example/*.java 
-		   #COMMAND cmake -E echo "Creating jar file...${JAVA_ARCHIVE}"
-		   #COMMAND ${JAVA_ARCHIVE} cvf example_swig.jar example
+                   COMMAND ${CMAKE_COMMAND} -E remove ${MANIFEST_FILE}
 		   )
+
 ADD_CUSTOM_COMMAND(TARGET example_swig
                    POST_BUILD
 	           COMMAND ${JAVA_COMPILE} "example_test.java")

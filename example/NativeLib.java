@@ -69,22 +69,12 @@ public final class NativeLib {
 		if (in == null) {
 			throw new RuntimeException("Cannot find library "+name+" in path "+Path+". Sorry, but this jar does not seem to be usable on your machine.");
 		}
-// Caching the file on disk: desactivated because it could fool the users 		
-//		if (new File(filename).isFile()) {
-//			// file was already unpacked -- use it directly
-//			System.load(new File(".").getAbsolutePath()+File.separator+filename);
-//			return;
-//		}
 		try {
 			// We must write the lib onto the disk before loading it -- stupid operating systems
 			File fileOut = new File(filename);
-//			if (!new File(".").canWrite()) {
-//				System.out.println("Cannot write in ."+File.separator+filename+"; unpacking the library into a temporary file instead");
-				fileOut = File.createTempFile(name+"-", ".tmp");
-				// don't leak the file on disk, but remove it on JVM shutdown
-				Runtime.getRuntime().addShutdownHook(new Thread(new FileCleaner(fileOut.getAbsolutePath())));
-//			}
-//			System.out.println("Unpacking SimGrid native library to " + fileOut.getAbsolutePath());
+			fileOut = File.createTempFile(name+"-", ".tmp");
+			// don't leak the file on disk, but remove it on JVM shutdown
+			Runtime.getRuntime().addShutdownHook(new Thread(new FileCleaner(fileOut.getAbsolutePath())));
 			OutputStream out = new FileOutputStream(fileOut);
 			
 			/* copy the library in position */  
@@ -97,6 +87,7 @@ public final class NativeLib {
 			in.close();
 			out.close();
 			System.load(fileOut.getAbsolutePath());
+
 		} catch (Exception e) {
 			System.err.println("Cannot load the bindings to the "+name+" library: ");
 			e.printStackTrace();
